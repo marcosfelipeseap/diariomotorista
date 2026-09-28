@@ -1,0 +1,239 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/gestor" class="btn btn-sm btn-light border shadow-sm mb-2 rounded-circle"><i class="bi bi-arrow-left"></i></a>
+                <h4 class="fw-bold mb-0">Monitoramento: <span class="text-primary"><%= motorista.nome %></span></h4>
+                <p class="text-muted small mb-0">Veículo: <strong><%= motorista.veiculos ? motorista.veiculos.placa : 'Nenhum' %></strong> | Último KM: <%= motorista.ultimo_km %></p>
+            </div>
+        </div>
+
+        <!-- Filtros de Data -->
+        <div class="card shadow-sm border-0 mb-4 bg-white">
+            <div class="card-body">
+                <form action="/gestor/monitorar/<%= motorista.id %>" method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold">Data Início</label>
+                        <input type="date" name="data_inicio" class="form-control" value="<%= filtros.data_inicio || '' %>" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted small fw-bold">Data Fim</label>
+                        <input type="date" name="data_fim" class="form-control" value="<%= filtros.data_fim || '' %>" required>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-2"></i>Filtrar</button>
+                        <% if(filtros.data_inicio) { %>
+                            <a href="/gestor/monitorar/<%= motorista.id %>" class="btn btn-outline-secondary w-100">Limpar</a>
+                        <% } %>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cards de Métricas -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-success-subtle">
+                    <div class="card-body text-center">
+                        <h6 class="text-success fw-bold text-uppercase small">Abastecimentos</h6>
+                        <h2 class="fw-bold text-dark mb-0"><%= metricas.qtdAbastecimentos %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-success text-white">
+                    <div class="card-body text-center">
+                        <h6 class="text-white-50 fw-bold text-uppercase small">Gasto Combustível</h6>
+                        <h3 class="fw-bold mb-0">R$ <%= metricas.totalGastoAbastecimento.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) %></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-danger-subtle">
+                    <div class="card-body text-center">
+                        <h6 class="text-danger fw-bold text-uppercase small">Manutenções</h6>
+                        <h2 class="fw-bold text-dark mb-0"><%= metricas.qtdManutencoes %></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h6 class="text-white-50 fw-bold text-uppercase small">Gasto Oficina</h6>
+                        <h3 class="fw-bold mb-0">R$ <%= metricas.totalGastoManutencao.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) %></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabelas de Histórico -->
+        <div class="row g-4">
+            <!-- Abastecimentos -->
+            <div class="col-xl-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-0 pt-4 pb-2">
+                        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-fuel-pump text-success me-2"></i>Histórico de Abastecimento</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light text-muted small">
+                                    <tr>
+                                        <th class="ps-4">Data</th>
+                                        <th>KM</th>
+                                        <th>Valor</th>
+                                        <th class="text-end pe-4">Comprovantes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% abastecimentos.forEach(ab => { %>
+                                        <tr>
+                                            <td class="ps-4 small"><%= new Date(ab.created_at).toLocaleDateString('pt-BR') %></td>
+                                            <td class="fw-bold text-primary"><%= ab.km %></td>
+                                            <td class="fw-bold text-success">
+                                                R$ <%= parseFloat(ab.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2}) %><br>
+                                                <small class="text-muted fw-normal"><%= ab.litros %>L (<%= ab.tipo_1 %>)</small>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <!-- Botão para abrir fotos do Abastecimento -->
+                                                <button class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAbast<%= ab.id %>">
+                                                    <i class="bi bi-camera me-1"></i> Ver Fotos
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal Fotos de Abastecimento -->
+                                        <div class="modal fade" id="modalAbast<%= ab.id %>" tabindex="-1">
+                                            <div class="modal-dialog modal-xl modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title fw-bold"><i class="bi bi-fuel-pump text-success me-2"></i>Fotos do Abastecimento</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row g-4">
+                                                            <div class="col-md-4 text-center">
+                                                                <h6 class="text-muted fw-bold mb-3">1. Bomba</h6>
+                                                                <a href="<%= ab.foto_bomba %>" target="_blank">
+                                                                    <img src="<%= ab.foto_bomba %>" class="img-fluid rounded border shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Foto da Bomba">
+                                                                </a>
+                                                            </div>
+                                                            <div class="col-md-4 text-center">
+                                                                <h6 class="text-muted fw-bold mb-3">2. Nota Fiscal</h6>
+                                                                <a href="<%= ab.foto_nota %>" target="_blank">
+                                                                    <img src="<%= ab.foto_nota %>" class="img-fluid rounded border shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Nota Fiscal">
+                                                                </a>
+                                                            </div>
+                                                            <div class="col-md-4 text-center">
+                                                                <h6 class="text-muted fw-bold mb-3">3. Painel (KM)</h6>
+                                                                <a href="<%= ab.foto_painel %>" target="_blank">
+                                                                    <img src="<%= ab.foto_painel %>" class="img-fluid rounded border shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Painel do Veículo">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                    <% if(abastecimentos.length === 0) { %>
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">Nenhum registro no período.</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manutenções -->
+            <div class="col-xl-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-0 pt-4 pb-2">
+                        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-tools text-danger me-2"></i>Histórico de Manutenção</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light text-muted small">
+                                    <tr>
+                                        <th class="ps-4">Data</th>
+                                        <th>KM / Tipo</th>
+                                        <th>Valor</th>
+                                        <th class="text-end pe-4">Comprovantes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% manutencoes.forEach(mn => { 
+                                        // Tratamento para ler o array de fotos (JSON salvo no banco)
+                                        let fotosManut = [];
+                                        try {
+                                            fotosManut = typeof mn.fotos === 'string' ? JSON.parse(mn.fotos) : mn.fotos;
+                                        } catch(e) {}
+                                    %>
+                                        <tr>
+                                            <td class="ps-4 small"><%= new Date(mn.created_at).toLocaleDateString('pt-BR') %></td>
+                                            <td>
+                                                <span class="fw-bold text-primary"><%= mn.km %></span><br>
+                                                <span class="badge <%= mn.tipo==='Preventiva'?'bg-info':'bg-warning text-dark' %>"><%= mn.tipo %></span>
+                                            </td>
+                                            <td class="fw-bold text-danger">
+                                                R$ <%= parseFloat(mn.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2}) %><br>
+                                                <small class="text-muted fw-normal"><%= mn.estabelecimento %></small>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <!-- Botão para abrir fotos da Manutenção -->
+                                                <button class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalManut<%= mn.id %>">
+                                                    <i class="bi bi-camera me-1"></i> Ver Fotos
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal Fotos de Manutenção -->
+                                        <div class="modal fade" id="modalManut<%= mn.id %>" tabindex="-1">
+                                            <div class="modal-dialog modal-xl modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title fw-bold"><i class="bi bi-tools text-danger me-2"></i>Fotos da Manutenção</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row g-4 justify-content-center">
+                                                            <% if(fotosManut && fotosManut.length > 0) { %>
+                                                                <% fotosManut.forEach((foto, index) => { %>
+                                                                    <div class="col-sm-6 col-md-4 text-center">
+                                                                        <h6 class="text-muted fw-bold mb-3">Foto <%= index + 1 %></h6>
+                                                                        <a href="<%= foto %>" target="_blank">
+                                                                            <img src="<%= foto %>" class="img-fluid rounded border shadow-sm" style="max-height: 350px; object-fit: contain;" alt="Foto de Manutenção">
+                                                                        </a>
+                                                                    </div>
+                                                                <% }) %>
+                                                            <% } else { %>
+                                                                <div class="col-12 text-center py-5">
+                                                                    <p class="text-muted">Nenhuma foto foi anexada a esta manutenção.</p>
+                                                                </div>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                    <% if(manutencoes.length === 0) { %>
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">Nenhum registro no período.</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+<%- include('../partials/footer') %>

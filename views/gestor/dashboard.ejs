@@ -1,0 +1,57 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-ui-checks-grid me-2"></i>Painel de Controle</h4>
+        
+        <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+        
+        <div class="row g-4">
+            <% motoristas.forEach(mot => { %>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0 text-truncate"><%= mot.nome %></h5>
+                            <% if(mot.status === 'aprovado') { %>
+                                <span class="badge bg-success-subtle text-success border border-success">Aprovado</span>
+                            <% } else { %>
+                                <span class="badge bg-warning-subtle text-warning border border-warning">Pendente</span>
+                            <% } %>
+                        </div>
+                        <div class="card-body pt-3 pb-2">
+                            <p class="text-muted small mb-3"><i class="bi bi-envelope me-2"></i><%= mot.email %></p>
+                            
+                            <div class="p-3 bg-light rounded-3 mb-3 border">
+                                <span class="d-block text-muted small fw-bold mb-1">Veículo Atual:</span>
+                                <% if (mot.veiculos) { %>
+                                    <h5 class="mb-0 fw-bold text-primary"><%= mot.veiculos.placa %> <span class="text-muted fs-6 fw-normal">(<%= mot.veiculos.modelo %>)</span></h5>
+                                <% } else { %>
+                                    <span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>Nenhum veículo vinculado</span>
+                                <% } %>
+                            </div>
+
+                            <div class="d-flex justify-content-between text-muted small fw-bold px-1">
+                                <span>KM Inicial: <%= mot.km_inicial || '0' %></span>
+                                <span>Último KM: <span class="text-dark"><%= mot.ultimo_km || '0' %></span></span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 pb-4 text-center">
+                            <a href="/gestor/monitorar/<%= mot.id %>" class="btn btn-outline-primary w-100 rounded-pill fw-bold">
+                                <i class="bi bi-search me-2"></i>Monitorar Motorista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+
+            <% if(motoristas.length === 0) { %>
+                <div class="col-12 text-center text-muted mt-5">
+                    <i class="bi bi-people fs-1 d-block mb-3"></i>
+                    Nenhum motorista cadastrado ainda.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+        <% if (success) { %> <div class="alert alert-success shadow-sm border-0"><%= success %></div> <% } %>
+
+        <% if (!usuario.veiculo_id) { %>
+            <div class="card bg-warning-subtle border-warning p-5 text-center shadow-sm">
+                <i class="bi bi-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                <h4 class="fw-bold text-dark">Nenhum Veículo Vinculado</h4>
+                <p class="text-muted mb-0">Aguarde o seu gestor vincular um veículo ao seu perfil para iniciar o diário.</p>
+            </div>
+        <% } else if (usuario.km_inicial === null) { %>
+            <!-- Tela de Primeiro Acesso -->
+            <div class="card p-4 p-md-5 text-center shadow-sm mx-auto" style="max-width: 500px;">
+                <div class="icon-wrapper bg-primary-subtle text-primary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 2rem;">
+                    <i class="bi bi-speedometer"></i>
+                </div>
+                <h4 class="fw-bold">Configuração Inicial</h4>
+                <p class="text-muted">Você está vinculado ao veículo <strong class="text-dark"><%= usuario.veiculos.placa %></strong>. Informe a quilometragem atual do painel para começar.</p>
+                <form action="/motorista/km-inicial" method="POST" class="mt-4">
+                    <input type="number" name="km_inicial" class="form-control form-control-lg text-center fw-bold mb-3 bg-light" required placeholder="Ex: 150400">
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">Registrar KM e Iniciar</button>
+                </form>
+            </div>
+        <% } else { %>
+            <!-- Dashboard Liberado -->
+            <h5 class="fw-bold text-secondary mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Status do Veículo</h5>
+            
+            <div class="card bg-dark text-white shadow mb-4 overflow-hidden" style="border-radius: 16px;">
+                <!-- Efeito visual no fundo do card -->
+                <div class="position-absolute opacity-25" style="right: -20px; top: -30px; font-size: 150px; transform: rotate(-15deg); pointer-events: none;">
+                    <i class="bi bi-truck"></i>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 position-relative">
+                    <div class="row align-items-center">
+                        <div class="col-7">
+                            <span class="badge bg-light text-dark fw-bold mb-2 px-3 py-2 fs-6 rounded-pill" style="font-family: monospace;">
+                                <%= usuario.veiculos.placa %>
+                            </span>
+                            <h3 class="fw-bold mb-0"><%= usuario.veiculos.modelo %></h3>
+                        </div>
+                        <div class="col-5 text-end border-start border-secondary">
+                            <p class="text-white-50 mb-1 small text-uppercase fw-bold">Último KM</p>
+                            <h2 class="text-warning fw-bold mb-0"><%= usuario.ultimo_km.toLocaleString('pt-BR') %></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-secondary mb-3 mt-5 text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Lançamentos Rápidos</h5>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <a href="/motorista/abastecimento" class="action-card p-4 text-center">
+                        <div class="icon-wrapper bg-success-subtle text-success mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                            <i class="bi bi-fuel-pump"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Abastecimento</h5>
+                        <p class="text-muted small mb-0">Registre notas e litros</p>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="/motorista/manutencao" class="action-card p-4 text-center">
+                        <div class="icon-wrapper bg-danger-subtle text-danger mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Manutenção</h5>
+                        <p class="text-muted small mb-0">Registre oficinas e peças</p>
+                    </a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+<%- include('../partials/footer') %>

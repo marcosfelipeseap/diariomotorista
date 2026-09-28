@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <h4 class="fw-bold mb-4">Controle de Motoristas</h4>
+
+        <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+        <% if (success) { %> <div class="alert alert-success shadow-sm border-0"><%= success %></div> <% } %>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Motorista</th>
+                            <th>Status do Acesso</th>
+                            <th>Veículo Vinculado</th>
+                            <th class="pe-4">Ação / Vínculo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% motoristas.forEach(mot => { %>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark"><%= mot.nome %></div>
+                                    <div class="text-muted small"><%= mot.email %></div>
+                                </td>
+                                <td>
+                                    <form action="/gestor/usuarios/status" method="POST">
+                                        <input type="hidden" name="id" value="<%= mot.id %>">
+                                        <select name="status" class="form-select form-select-sm w-auto <%= mot.status === 'aprovado' ? 'border-success text-success' : (mot.status === 'pendente' ? 'border-warning text-warning' : 'border-danger text-danger') %> fw-bold" onchange="this.form.submit()">
+                                            <option value="pendente" <%= mot.status === 'pendente' ? 'selected' : '' %>>⏳ Pendente</option>
+                                            <option value="aprovado" <%= mot.status === 'aprovado' ? 'selected' : '' %>>✅ Aprovado</option>
+                                            <option value="reprovado" <%= mot.status === 'reprovado' ? 'selected' : '' %>>❌ Reprovado</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <% if (mot.veiculos) { %>
+                                        <span class="badge border border-primary text-primary bg-primary-subtle fs-6 rounded-3 px-3 py-1" style="font-family: monospace;">
+                                            <%= mot.veiculos.placa %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="badge bg-light text-muted border">Sem veículo</span>
+                                    <% } %>
+                                </td>
+                                <td class="pe-4">
+                                    <% if (mot.status === 'aprovado') { %>
+                                        <form action="/gestor/usuarios/vincular" method="POST" class="d-flex align-items-center gap-2">
+                                            <input type="hidden" name="usuario_id" value="<%= mot.id %>">
+                                            <select name="veiculo_id" class="form-select form-select-sm w-auto">
+                                                <option value="">-- Desvincular --</option>
+                                                <% veiculosDisponiveis.forEach(v => { %>
+                                                    <option value="<%= v.id %>"><%= v.placa %> (<%= v.modelo %>)</option>
+                                                <% }) %>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary py-1">Vincular</button>
+                                        </form>
+                                    <% } else { %>
+                                        <span class="text-muted small"><i class="bi bi-info-circle"></i> Aprove para vincular</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer') %>

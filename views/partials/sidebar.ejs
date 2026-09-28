@@ -1,0 +1,83 @@
+<div class="sidebar flex-shrink-0 p-3" id="sidebar" style="width: 270px;">
+    <div class="position-sticky pt-1">
+        
+        <ul class="nav flex-column mb-auto" id="main-nav-menu">
+            <% if (user.role === 'gestor' || user.role === 'admin') { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gestor">
+                        <i class="bi bi-ui-checks-grid"></i> Painel do Gestor
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gestor/veiculos">
+                        <i class="bi bi-truck"></i> Gestão de Veículos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gestor/usuarios">
+                        <i class="bi bi-people"></i> Controle de Motoristas
+                    </a>
+                </li>
+            <% } else if (user.role === 'motorista') { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="/motorista">
+                        <i class="bi bi-speedometer"></i> Meu Painel Diário
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/motorista/historico">
+                        <i class="bi bi-clock-history"></i> Meu Histórico
+                    </a>
+                </li>
+                
+                <hr class="my-2 border-secondary opacity-25">
+                
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" href="/motorista/abastecimento">
+                        <i class="bi bi-fuel-pump"></i> Registrar Abastecimento
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/motorista/manutencao">
+                        <i class="bi bi-tools"></i> Registrar Manutenção
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-5 mb-1 text-muted text-uppercase">
+            <span style="font-size: 0.75rem;">Conta (<%= user.role %>)</span>
+        </h6>
+        
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-2" href="/perfil">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border shadow-sm" 
+                         style="width: 26px; height: 26px; min-width: 26px; font-size: 0.85rem; font-weight: bold;">
+                        <%= user.nome ? user.nome.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                    Meu Perfil
+                </a>
+            </li>
+            
+            <li class="nav-item mt-2 border-top pt-2">
+                <a class="nav-link text-danger d-flex align-items-center gap-2" href="/logout">
+                    <i class="bi bi-box-arrow-right" style="font-size: 1.2rem; margin-left: 2px;"></i>
+                    Sair do Sistema
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('#main-nav-menu .nav-link');
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active', 'text-primary', 'fw-bold');
+            }
+        });
+    });
+</script>

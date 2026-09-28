@@ -1,0 +1,75 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <div class="mx-auto" style="max-width: 650px;">
+            <div class="d-flex align-items-center mb-4">
+                <a href="/motorista" class="btn btn-sm btn-light border shadow-sm mb-2 rounded-circle"><i class="bi bi-arrow-left"></i></a>
+                <h4 class="fw-bold mb-0">Registrar Manutenção</h4>
+            </div>
+
+            <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+            
+            <form action="/motorista/manutencao" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5">
+                
+                <h6 class="fw-bold text-danger mb-3"><i class="bi bi-tools me-2"></i>Dados do Serviço</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label class="form-label text-muted small fw-bold">Tipo de Manutenção</label>
+                        <select name="tipo" class="form-select bg-light" required>
+                            <option value="Preventiva">Preventiva (Revisão, troca de óleo, etc)</option>
+                            <option value="Corretiva">Corretiva (Conserto de quebra)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Valor Total (R$)</label>
+                        <input type="number" step="0.01" name="valor" class="form-control" required placeholder="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">KM Atual <span class="text-danger">(Último: <%= ultimo_km %>)</span></label>
+                        <input type="number" name="km" class="form-control fw-bold text-primary bg-primary-subtle border-primary" min="<%= ultimo_km %>" required placeholder="KM do veículo">
+                    </div>
+                </div>
+                
+                <hr class="text-secondary opacity-25 my-1">
+
+                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-geo-alt me-2"></i>Oficina / Local</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-12"><input type="text" name="estabelecimento" class="form-control" placeholder="Nome da Oficina ou Loja" required></div>
+                    <div class="col-8"><input type="text" name="cidade" class="form-control" placeholder="Cidade" required></div>
+                    <div class="col-4"><input type="text" name="estado" class="form-control text-uppercase" placeholder="UF" maxlength="2" required></div>
+                </div>
+
+                <hr class="text-secondary opacity-25 my-1">
+
+                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-camera me-2"></i>Fotos da Manutenção</h6>
+                <div class="col-12">
+                    <label class="form-label text-muted small fw-bold">Anexe a Nota Fiscal, peças e painel <small class="text-muted fw-normal">(Tire na hora ou escolha da galeria)</small></label>
+                    <!-- Sem o capture para permitir escolha múltipla entre Câmera e Galeria -->
+                    <input type="file" name="fotos" class="form-control form-control-lg bg-light" accept="image/*" multiple required>
+                    <div class="form-text text-muted mt-2"><i class="bi bi-info-circle me-1"></i>Selecione ou tire até 5 fotos referentes ao serviço realizado.</div>
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-lg w-100 mt-5 rounded-pill shadow-sm form-submit-btn">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TELA DE CARREGAMENTO (ESTILO APP) -->
+<div id="app-loader">
+    <div class="spinner-border text-danger mb-3" role="status"></div>
+    <h4 class="fw-bold text-dark">Salvando Manutenção...</h4>
+    <p class="text-muted small text-center px-4">Fazendo o upload das fotos seguras para a nuvem.<br>Por favor, aguarde e não feche o aplicativo.</p>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (this.checkValidity()) {
+            document.getElementById('app-loader').classList.add('active');
+            document.querySelector('.form-submit-btn').disabled = true;
+        }
+    });
+</script>
+<%- include('../partials/footer') %>

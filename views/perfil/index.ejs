@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <div class="mx-auto" style="max-width: 600px;">
+            <h4 class="fw-bold mb-4"><i class="bi bi-person-circle me-2"></i>Meu Perfil</h4>
+
+            <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+            <% if (success) { %> <div class="alert alert-success shadow-sm border-0"><%= success %></div> <% } %>
+
+            <!-- Formulário de Dados Básicos -->
+            <div class="card shadow-sm border-0 p-4 mb-4">
+                <h5 class="fw-bold mb-3 text-dark">Informações Pessoais</h5>
+                <form action="/perfil/atualizar" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Nome Completo</label>
+                        <input type="text" name="nome" class="form-control" value="<%= usuario.nome %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">E-mail</label>
+                        <input type="email" name="email" class="form-control" value="<%= usuario.email %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Cargo / Perfil</label>
+                        <input type="text" class="form-control bg-light text-uppercase" value="<%= usuario.role %>" disabled>
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4">Salvar Alterações</button>
+                </form>
+            </div>
+
+            <!-- Formulário de Alteração de Senha -->
+            <div class="card shadow-sm border-0 p-4 mb-5">
+                <h5 class="fw-bold mb-3 text-danger">Segurança (Alterar Senha)</h5>
+                <form action="/perfil/senha" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Senha Atual</label>
+                        <input type="password" name="senha_atual" class="form-control" required placeholder="Digite sua senha atual">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Nova Senha</label>
+                        <input type="password" name="nova_senha" class="form-control" required placeholder="Digite a nova senha">
+                    </div>
+                    <button type="submit" class="btn btn-outline-danger px-4">Atualizar Senha</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer') %>

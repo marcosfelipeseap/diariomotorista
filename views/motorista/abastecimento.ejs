@@ -1,0 +1,101 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<div class="d-flex">
+    <%- include('../partials/sidebar') %>
+    <div class="main-content">
+        <div class="mx-auto" style="max-width: 650px;">
+            <div class="d-flex align-items-center mb-4">
+                <a href="/motorista" class="btn btn-sm btn-light border shadow-sm mb-2 rounded-circle"><i class="bi bi-arrow-left"></i></a>
+                <h4 class="fw-bold mb-0">Registrar Abastecimento</h4>
+            </div>
+
+            <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
+            
+            <form action="/motorista/abastecimento" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5">
+                
+                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Dados do Combustível</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Combustível 1</label>
+                        <select name="tipo_1" class="form-select bg-light" required>
+                            <option value="Diesel S10">Diesel S10</option>
+                            <option value="Arla">Arla</option>
+                            <option value="Gasolina">Gasolina</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold">Combustível 2 (Opcional)</label>
+                        <select name="tipo_2" class="form-select bg-light">
+                            <option value="">Nenhum</option>
+                            <option value="Arla">Arla</option>
+                            <option value="Diesel S10">Diesel S10</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-muted small fw-bold">Litros Totais</label>
+                        <input type="number" step="0.01" name="litros" class="form-control" required placeholder="0.00">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-muted small fw-bold">Valor Total (R$)</label>
+                        <input type="number" step="0.01" name="valor" class="form-control" required placeholder="0.00">
+                    </div>
+                </div>
+                
+                <hr class="text-secondary opacity-25 my-1">
+
+                <h6 class="fw-bold text-warning mt-4 mb-3"><i class="bi bi-speedometer2 me-2"></i>Quilometragem</h6>
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">KM do Veículo <span class="text-danger">(Último registrado: <%= ultimo_km %>)</span></label>
+                    <input type="number" name="km" class="form-control form-control-lg fw-bold text-primary bg-primary-subtle border-primary" min="<%= ultimo_km %>" required placeholder="Informe o KM atual">
+                </div>
+
+                <hr class="text-secondary opacity-25 my-1">
+
+                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-geo-alt me-2"></i>Localização</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-12"><input type="text" name="estabelecimento" class="form-control" placeholder="Nome do Posto / Estabelecimento" required></div>
+                    <div class="col-8"><input type="text" name="cidade" class="form-control" placeholder="Cidade" required></div>
+                    <div class="col-4"><input type="text" name="estado" class="form-control text-uppercase" placeholder="UF" maxlength="2" required></div>
+                </div>
+
+                <hr class="text-secondary opacity-25 my-1">
+
+                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-camera me-2"></i>Comprovantes Visuais <small class="text-muted fw-normal">(Tire na hora ou escolha da galeria)</small></h6>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label text-muted small fw-bold">1. Foto da Bomba</label>
+                        <!-- Sem o capture para permitir escolha entre Câmera e Galeria -->
+                        <input type="file" name="foto_bomba" class="form-control" accept="image/*" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted small fw-bold">2. Foto da Nota Fiscal</label>
+                        <input type="file" name="foto_nota" class="form-control" accept="image/*" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted small fw-bold">3. Foto do Painel (Mostrando KM)</label>
+                        <input type="file" name="foto_painel" class="form-control" accept="image/*" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-5 rounded-pill shadow-sm form-submit-btn">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TELA DE CARREGAMENTO (ESTILO APP) -->
+<div id="app-loader">
+    <div class="spinner-border text-primary mb-3" role="status"></div>
+    <h4 class="fw-bold text-dark">Enviando dados...</h4>
+    <p class="text-muted small text-center px-4">Fazendo o upload das fotos seguras para a nuvem.<br>Por favor, aguarde e não feche o aplicativo.</p>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (this.checkValidity()) {
+            document.getElementById('app-loader').classList.add('active');
+            document.querySelector('.form-submit-btn').disabled = true;
+        }
+    });
+</script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-md bg-white border-bottom shadow-sm sticky-top px-3 py-2">
+    <div class="container-fluid">
+        <!-- Botão Menu Mobile (Hamburger) -->
+        <% if(user) { %>
+        <button class="btn btn-light border d-md-none me-3" type="button" id="sidebarToggle">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+        <% } %>
+        
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/img/logo.png" alt="Logo" height="35" onerror="this.src='https://via.placeholder.com/150x40?text=LOGO'">
+            <span class="ms-2 fw-bold text-dark fs-5 d-none d-sm-block">Diário de Motorista</span>
+        </a>
+        
+        <% if(user && user.role === 'motorista') { %>
+        <div class="ms-auto d-none d-md-block text-end">
+            <span class="text-muted" style="font-size: 0.85rem;">Veículo:</span><br>
+            <strong class="text-primary"><%= user.placa_veiculo ? user.placa_veiculo : 'Nenhum' %></strong>
+        </div>
+        <% } %>
+    </div>
+</nav>

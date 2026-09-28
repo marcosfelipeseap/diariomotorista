@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4">Cadastro de Motorista</h4>
+                    
+                    <% if (error) { %>
+                        <div class="alert alert-danger"><%= error %></div>
+                    <% } %>
+                    <% if (success) { %>
+                        <div class="alert alert-success"><%= success %></div>
+                    <% } %>
+
+                    <form action="/register" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" name="nome" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="senha" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Solicitar Cadastro</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <a href="/login" class="text-decoration-none">Já tem conta? Faça login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

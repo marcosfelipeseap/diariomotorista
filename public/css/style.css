@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    width: calc(100% - 270px);
+}
+
+/* Cards e Elementos */
+.card { border: none; border-radius: 12px; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+.card-header { background-color: #fff; border-bottom: 1px solid rgba(0,0,0,.05); border-radius: 12px 12px 0 0 !important; font-weight: 600;}
+
+/* Inputs */
+.form-control, .form-select { border-radius: 8px; padding: 0.6rem 1rem; border-color: #dee2e6; }
+.form-control:focus, .form-select:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); border-color: #86b7fe; }
+.btn { border-radius: 8px; font-weight: 500; }
+
+/* Ícones de Ação (Dashboard do Motorista) */
+.action-card { transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; border: 1px solid rgba(0,0,0,.05); background: #fff; border-radius: 12px; display: block; }
+.action-card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); }
+.icon-wrapper { width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.5rem; }
+
+/* Tabelas Modernas */
+.table > :not(caption) > * > * { padding: 1rem 0.75rem; vertical-align: middle; border-bottom-color: #f1f3f5; }
+.table-light th { background-color: #f1f3f5; color: #495057; font-weight: 600; border-bottom: 0; }
+
+/* Tela de Carregamento (App-like Feedback) */
+#app-loader {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#app-loader.active {
+    visibility: visible;
+    opacity: 1;
+}
+.spinner-border { width: 3rem; height: 3rem; border-width: 0.35em; }
+
+/* Estilo App para os Cards do Histórico */
+.app-history-card {
+    border-left: 4px solid var(--bs-primary);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 15px;
+    margin-bottom: 12px;
+}
+.app-history-card.danger { border-left-color: #dc3545; }
+
+/* Comportamento para Celulares */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -270px;
+        top: 61px;
+        height: calc(100vh - 61px);
+        z-index: 1050;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+    }
+    .sidebar.show { left: 0; }
+    .main-content { width: 100%; padding: 15px; }
+}
