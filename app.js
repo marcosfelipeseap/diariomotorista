@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 require('dotenv').config();
 
 const app = express();
@@ -17,20 +17,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuração de Sessão Inteligente (Funciona em Localhost e Vercel)
+// Configuração de Sessão baseada em Cookie (Perfeita para Vercel e Localhost)
 const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-app.use(session({
-    secret: 'chave_secreta_diario_motorista', 
-    resave: false,
-    saveUninitialized: false,
-    proxy: true,
-    cookie: { 
-        maxAge: thirtyDays,
-        // true apenas em produção (Vercel/HTTPS), false localmente (HTTP)
-        secure: process.env.NODE_ENV === 'production', 
-        httpOnly: true,
-        sameSite: 'lax'
-    } 
+app.use(cookieSession({
+    name: 'session_diario',
+    keys: ['chave_secreta_super_segura_motorista'],
+    maxAge: thirtyDays,
+    secure: process.env.NODE_ENV === 'production', // true na Vercel, false no localhost
+    httpOnly: true,
+    sameSite: 'lax'
 }));
 
 // Disponibilizar a sessão para todas as views do EJS
