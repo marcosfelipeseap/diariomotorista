@@ -1,0 +1,15 @@
+{
+  "appId": "com.diariomotorista.app",
+  "appName": "Motorista - UGTR",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://diariomotorista.vercel.app",
+    "cleartext": true
+  },
+  "plugins": {
+    "Camera": {
+      "permissions": ["camera", "photos"]
+    }
+  }
+}

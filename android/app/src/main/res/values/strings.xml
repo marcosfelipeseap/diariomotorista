@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Motorista - UGTR</string>
+    <string name="title_activity_main">Motorista - UGTR</string>
+    <string name="package_name">com.diariomotorista.app</string>
+    <string name="custom_url_scheme">com.diariomotorista.app</string>
+</resources>
