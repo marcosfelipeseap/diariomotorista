@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 
-// IMPORTANTE PARA A VERCEL: Confia no proxy reverso para aceitar os cookies HTTPS
+// IMPORTANTE PARA A VERCEL: Confia no proxy reverso
 app.set('trust proxy', 1);
 
 // Configuração do EJS
@@ -17,15 +17,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuração de Sessão Otimizada para Produção/Vercel
+// Configuração de Sessão Inteligente (Funciona em Localhost e Vercel)
 const thirtyDays = 30 * 24 * 60 * 60 * 1000;
 app.use(session({
     secret: 'chave_secreta_diario_motorista', 
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: { 
         maxAge: thirtyDays,
-        secure: true, // Obrigatório true na Vercel (HTTPS)
+        // true apenas em produção (Vercel/HTTPS), false localmente (HTTP)
+        secure: process.env.NODE_ENV === 'production', 
         httpOnly: true,
         sameSite: 'lax'
     } 
