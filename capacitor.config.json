@@ -6,10 +6,5 @@
   "server": {
     "url": "https://diariomotorista.vercel.app",
     "cleartext": true
-  },
-  "plugins": {
-    "Camera": {
-      "permissions": ["camera", "photos"]
-    }
   }
 }
