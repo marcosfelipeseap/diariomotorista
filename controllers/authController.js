@@ -75,6 +75,7 @@ exports.register = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    req.session.destroy();
+    // Limpa o cookie da sessão ao invés de usar o destroy()
+    req.session = null;
     res.redirect('/login');
 };
