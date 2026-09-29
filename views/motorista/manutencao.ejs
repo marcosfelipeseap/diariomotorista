@@ -11,7 +11,7 @@
 
             <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
             
-            <form action="/motorista/manutencao" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5">
+            <form action="/motorista/manutencao" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5" id="formManutencao">
                 
                 <h6 class="fw-bold text-danger mb-3"><i class="bi bi-tools me-2"></i>Dados do Serviço</h6>
                 <div class="row g-3 mb-4">
@@ -45,10 +45,20 @@
 
                 <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-camera me-2"></i>Fotos da Manutenção</h6>
                 <div class="col-12">
-                    <label class="form-label text-muted small fw-bold">Anexe a Nota Fiscal, peças e painel <small class="text-muted fw-normal">(Tire na hora ou escolha da galeria)</small></label>
-                    <!-- Sem o capture para permitir escolha múltipla entre Câmera e Galeria -->
-                    <input type="file" name="fotos" class="form-control form-control-lg bg-light" accept="image/*" multiple required>
-                    <div class="form-text text-muted mt-2"><i class="bi bi-info-circle me-1"></i>Selecione ou tire até 5 fotos referentes ao serviço realizado.</div>
+                    <label class="form-label text-muted small fw-bold">Anexe a Nota Fiscal, peças e painel</label>
+                    
+                    <!-- Input de fotos: não tem o 'name' inicialmente, o JS criará no final -->
+                    <input type="file" id="fotos_manutencao" class="form-control form-control-lg bg-light mb-2" accept="image/*" multiple>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>De 5 a 15 fotos.</small>
+                        <span id="contador-fotos" class="badge bg-secondary">0 / 15</span>
+                    </div>
+
+                    <!-- Galeria de Previews (Será preenchida pelo JS) -->
+                    <div id="galeria_previews" class="d-flex flex-wrap gap-2 mt-3 p-3 bg-light rounded border d-none">
+                        <!-- Imagens aparecerão aqui -->
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-danger btn-lg w-100 mt-5 rounded-pill shadow-sm form-submit-btn">Salvar Registro</button>
@@ -61,14 +71,119 @@
 <div id="app-loader">
     <div class="spinner-border text-danger mb-3" role="status"></div>
     <h4 class="fw-bold text-dark">Salvando Manutenção...</h4>
-    <p class="text-muted small text-center px-4">Fazendo o upload das fotos seguras para a nuvem.<br>Por favor, aguarde e não feche o aplicativo.</p>
+    <p class="text-muted small text-center px-4">Otimizando e enviando as fotos.<br>Por favor, aguarde e não feche o aplicativo.</p>
 </div>
 
+<!-- Biblioteca de Compressão de Imagem no Navegador -->
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+
 <script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (this.checkValidity()) {
-            document.getElementById('app-loader').classList.add('active');
-            document.querySelector('.form-submit-btn').disabled = true;
+    // Gerenciador de Múltiplas Fotos
+    let arquivosSelecionados = [];
+    const inputFotos = document.getElementById('fotos_manutencao');
+    const galeria = document.getElementById('galeria_previews');
+    const contador = document.getElementById('contador-fotos');
+
+    inputFotos.addEventListener('change', function() {
+        const novosArquivos = Array.from(this.files);
+        
+        // Regra Rigorosa: Bloqueia se passar de 15
+        if (arquivosSelecionados.length + novosArquivos.length > 15) {
+            alert('Atenção: O limite máximo é de 15 fotos. Você tentou adicionar ' + (arquivosSelecionados.length + novosArquivos.length) + ' no total.');
+            this.value = ''; // Limpa seleção atual que estourou o limite
+            return;
+        }
+
+        // Junta as antigas com as novas
+        arquivosSelecionados = arquivosSelecionados.concat(novosArquivos);
+        this.value = ''; // Reseta o input para o usuário poder clicar de novo e somar mais fotos
+        atualizarGaleria();
+    });
+
+    function atualizarGaleria() {
+        galeria.innerHTML = '';
+        contador.innerText = `${arquivosSelecionados.length} / 15`;
+
+        if (arquivosSelecionados.length > 0) {
+            galeria.classList.remove('d-none');
+        } else {
+            galeria.classList.add('d-none');
+        }
+
+        arquivosSelecionados.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative';
+            
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = 'img-thumbnail shadow-sm';
+            img.style.height = '100px';
+            img.style.width = '100px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '8px';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle px-1 py-0';
+            btn.innerHTML = '<i class="bi bi-x fs-6"></i>';
+            btn.onclick = () => removerFotoDaGaleria(index);
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(btn);
+            galeria.appendChild(wrapper);
+        });
+    }
+
+    function removerFotoDaGaleria(index) {
+        arquivosSelecionados.splice(index, 1); // Remove da lista
+        atualizarGaleria(); // Recarrega
+    }
+
+    // Processamento Final e Envio
+    document.getElementById('formManutencao').addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+        
+        if (arquivosSelecionados.length < 5 || arquivosSelecionados.length > 15) {
+            alert(`Por favor, anexe entre 5 e 15 fotos.\nVocê anexou ${arquivosSelecionados.length} fotos.`);
+            return;
+        }
+
+        if (!this.checkValidity()) {
+            this.reportValidity();
+            return;
+        }
+
+        const btnSubmit = this.querySelector('.form-submit-btn');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Otimizando fotos...';
+        document.getElementById('app-loader').classList.add('active');
+
+        const options = { maxSizeMB: 0.8, maxWidthOrHeight: 1280, useWebWorker: true };
+
+        try {
+            // Cria um pacote seguro para enviar os arquivos da nossa memória (array)
+            const dataTransfer = new DataTransfer();
+            
+            for (let i = 0; i < arquivosSelecionados.length; i++) {
+                const file = arquivosSelecionados[i];
+                const compressedFile = await imageCompression(file, options);
+                dataTransfer.items.add(new File([compressedFile], compressedFile.name, { type: compressedFile.type }));
+            }
+            
+            // Atribui as imagens finais compactadas ao input e dá o NOME "fotos" para o Node ler
+            inputFotos.files = dataTransfer.files;
+            inputFotos.name = "fotos";
+            
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+            this.submit();
+
+        } catch (error) {
+            console.error('Erro ao comprimir:', error);
+            alert('Erro ao processar as fotos. Tente novamente.');
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+            document.getElementById('app-loader').classList.remove('active');
         }
     });
 </script>

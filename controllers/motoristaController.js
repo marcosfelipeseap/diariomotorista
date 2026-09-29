@@ -132,6 +132,11 @@ exports.salvarManutencao = async (req, res) => {
             return res.redirect(`/motorista/manutencao?error=O KM não pode ser menor que o último (${usuario.ultimo_km}).`);
         }
 
+        // Validação estrita de quantidade de fotos no Back-end (5 a 15)
+        if (!req.files || req.files.length < 5 || req.files.length > 15) {
+            return res.redirect('/motorista/manutencao?error=Você deve enviar entre 5 e 15 fotos.');
+        }
+
         const fotosUrls = [];
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {

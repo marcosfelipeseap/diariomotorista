@@ -96,7 +96,7 @@
                                             <td class="fw-bold text-primary"><%= ab.km %></td>
                                             <td class="fw-bold text-success">
                                                 R$ <%= parseFloat(ab.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2}) %><br>
-                                                <small class="text-muted fw-normal"><%= ab.litros %>L (<%= ab.tipo_1 %>)</small>
+                                                <small class="text-muted fw-normal"><%= ab.litros %>L (<%= ab.tipo_1 %><%= ab.tipo_2 ? ' / ' + ab.tipo_2 : '' %>)</small>
                                             </td>
                                             <td class="text-end pe-4">
                                                 <!-- Botão para abrir fotos do Abastecimento -->

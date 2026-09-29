@@ -11,7 +11,7 @@
 
             <% if (error) { %> <div class="alert alert-danger shadow-sm border-0"><%= error %></div> <% } %>
             
-            <form action="/motorista/abastecimento" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5">
+            <form action="/motorista/abastecimento" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4 p-md-5 mb-5" id="formAbastecimento">
                 
                 <h6 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Dados do Combustível</h6>
                 <div class="row g-3 mb-4">
@@ -60,20 +60,34 @@
 
                 <hr class="text-secondary opacity-25 my-1">
 
-                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-camera me-2"></i>Comprovantes Visuais <small class="text-muted fw-normal">(Tire na hora ou escolha da galeria)</small></h6>
+                <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-camera me-2"></i>Comprovantes Visuais</h6>
                 <div class="row g-3">
+                    <!-- Bomba -->
                     <div class="col-12">
                         <label class="form-label text-muted small fw-bold">1. Foto da Bomba</label>
-                        <!-- Sem o capture para permitir escolha entre Câmera e Galeria -->
-                        <input type="file" name="foto_bomba" class="form-control" accept="image/*" required>
+                        <input type="file" name="foto_bomba" id="input_bomba" class="form-control" accept="image/*" required onchange="mostrarPreview(this, 'preview_bomba')">
+                        <div id="preview_bomba" class="mt-2 d-none position-relative" style="width: fit-content;">
+                            <img src="" class="img-thumbnail shadow-sm" style="max-height: 150px; border-radius: 8px;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle px-2" onclick="removerPreview('input_bomba', 'preview_bomba')"><i class="bi bi-x fs-5"></i></button>
+                        </div>
                     </div>
+                    <!-- Nota -->
                     <div class="col-12">
                         <label class="form-label text-muted small fw-bold">2. Foto da Nota Fiscal</label>
-                        <input type="file" name="foto_nota" class="form-control" accept="image/*" required>
+                        <input type="file" name="foto_nota" id="input_nota" class="form-control" accept="image/*" required onchange="mostrarPreview(this, 'preview_nota')">
+                        <div id="preview_nota" class="mt-2 d-none position-relative" style="width: fit-content;">
+                            <img src="" class="img-thumbnail shadow-sm" style="max-height: 150px; border-radius: 8px;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle px-2" onclick="removerPreview('input_nota', 'preview_nota')"><i class="bi bi-x fs-5"></i></button>
+                        </div>
                     </div>
+                    <!-- Painel -->
                     <div class="col-12">
                         <label class="form-label text-muted small fw-bold">3. Foto do Painel (Mostrando KM)</label>
-                        <input type="file" name="foto_painel" class="form-control" accept="image/*" required>
+                        <input type="file" name="foto_painel" id="input_painel" class="form-control" accept="image/*" required onchange="mostrarPreview(this, 'preview_painel')">
+                        <div id="preview_painel" class="mt-2 d-none position-relative" style="width: fit-content;">
+                            <img src="" class="img-thumbnail shadow-sm" style="max-height: 150px; border-radius: 8px;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle px-2" onclick="removerPreview('input_painel', 'preview_painel')"><i class="bi bi-x fs-5"></i></button>
+                        </div>
                     </div>
                 </div>
 
@@ -87,14 +101,78 @@
 <div id="app-loader">
     <div class="spinner-border text-primary mb-3" role="status"></div>
     <h4 class="fw-bold text-dark">Enviando dados...</h4>
-    <p class="text-muted small text-center px-4">Fazendo o upload das fotos seguras para a nuvem.<br>Por favor, aguarde e não feche o aplicativo.</p>
+    <p class="text-muted small text-center px-4">Otimizando e salvando as fotos de forma segura.<br>Por favor, aguarde e não feche o aplicativo.</p>
 </div>
 
+<!-- Biblioteca de Compressão de Imagem no Navegador -->
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+
 <script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (this.checkValidity()) {
-            document.getElementById('app-loader').classList.add('active');
-            document.querySelector('.form-submit-btn').disabled = true;
+    // Sistema de Previews Individuais
+    function mostrarPreview(input, previewId) {
+        const previewDiv = document.getElementById(previewId);
+        const img = previewDiv.querySelector('img');
+        
+        if (input.files && input.files[0]) {
+            img.src = URL.createObjectURL(input.files[0]);
+            previewDiv.classList.remove('d-none');
+        } else {
+            previewDiv.classList.add('d-none');
+        }
+    }
+
+    function removerPreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const previewDiv = document.getElementById(previewId);
+        input.value = ''; // Limpa o arquivo
+        previewDiv.classList.add('d-none');
+    }
+
+    // Processamento de Compressão e Envio
+    document.getElementById('formAbastecimento').addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+        
+        if (!this.checkValidity()) {
+            this.reportValidity();
+            return;
+        }
+
+        const btnSubmit = this.querySelector('.form-submit-btn');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Otimizando fotos...';
+        document.getElementById('app-loader').classList.add('active');
+
+        const options = { maxSizeMB: 0.8, maxWidthOrHeight: 1280, useWebWorker: true };
+
+        try {
+            const fileInputs = this.querySelectorAll('input[type="file"]');
+            
+            for (let input of fileInputs) {
+                if (input.files.length > 0) {
+                    const dataTransfer = new DataTransfer();
+                    for (let i = 0; i < input.files.length; i++) {
+                        const file = input.files[i];
+                        if (file.type.startsWith('image/')) {
+                            const compressedFile = await imageCompression(file, options);
+                            dataTransfer.items.add(new File([compressedFile], compressedFile.name, { type: compressedFile.type }));
+                        } else {
+                            dataTransfer.items.add(file);
+                        }
+                    }
+                    input.files = dataTransfer.files;
+                }
+            }
+            
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+            this.submit();
+
+        } catch (error) {
+            console.error('Erro ao comprimir:', error);
+            alert('Erro ao processar as fotos. Tente novamente.');
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+            document.getElementById('app-loader').classList.remove('active');
         }
     });
 </script>

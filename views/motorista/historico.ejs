@@ -71,7 +71,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <span class="d-block fw-bold text-success">R$ <%= parseFloat(ab.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) %></span>
-                                    <small class="text-muted"><%= ab.litros %>L • <%= ab.tipo_1 %></small>
+                                    <small class="text-muted"><%= ab.litros %>L • <%= ab.tipo_1 %><%= ab.tipo_2 ? ' + ' + ab.tipo_2 : '' %></small>
                                 </div>
                                 <button class="btn btn-sm btn-light border rounded-pill text-primary" data-bs-toggle="modal" data-bs-target="#modalAbast<%= ab.id %>">Ver Fotos</button>
                             </div>
